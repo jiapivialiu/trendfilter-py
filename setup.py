@@ -18,6 +18,8 @@ def get_eigen_include():
         "/usr/local/include/eigen3",     # Linux/Unix
         "/usr/include/eigen3",           # System installation
         "/usr/include/eigen",            # Alternative system path
+        "C:/vcpkg/installed/x64-windows/include/eigen3",  # Windows vcpkg
+        "C:/Program Files/Eigen3/include/eigen3",         # Windows manual install
     ]
     
     for path in potential_paths:
@@ -36,7 +38,13 @@ def get_eigen_include():
     except Exception:
         pass
     
-    raise RuntimeError("Could not find Eigen installation. Please install Eigen3.")
+    # Final fallback - warn but continue
+    print("Warning: Could not find Eigen installation.")
+    print("Build may fail. Please install Eigen3:")
+    print("  - Ubuntu/Debian: sudo apt-get install libeigen3-dev")
+    print("  - macOS: brew install eigen")
+    print("  - Windows: vcpkg install eigen3:x64-windows")
+    return "/usr/include/eigen3"  # Default fallback
 
 
 # Read the contents of README file
@@ -56,9 +64,12 @@ try:
     eigen_include = get_eigen_include()
     include_dirs.append(eigen_include)
     print(f"Found Eigen at: {eigen_include}")
-except RuntimeError as e:
+except Exception as e:
     print(f"Warning: {e}")
-    print("You may need to install Eigen3 or set the include path manually.")
+    # Use fallback
+    eigen_include = get_eigen_include()
+    include_dirs.append(eigen_include)
+    print(f"Using fallback Eigen path: {eigen_include}")
 
 # Define the extension module
 ext_modules = [
@@ -95,15 +106,15 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: C++",
         "Topic :: Scientific/Engineering",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=[
         "numpy>=1.18.0",
         "scipy>=1.5.0",
