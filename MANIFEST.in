@@ -1,0 +1,26 @@
+include README.md
+include LICENSE
+include MANIFEST.in
+include pyproject.toml
+include setup.py
+
+# Include C++ source files
+recursive-include trendfilterpy/src *.cpp *.h
+recursive-include trendfilterpy/conf *
+
+# Include data files
+recursive-include data *
+
+# Exclude compiled files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude .git*
+global-exclude .coverage
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.dll
+prune build
+prune dist
+prune *.egg-info

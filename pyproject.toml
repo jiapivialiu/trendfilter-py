@@ -1,0 +1,78 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "pybind11>=2.6.0",
+    "numpy>=1.18.0"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trendfilter-py"
+version = "0.1.0"
+description = "Python package for fast and flexible univariate trend filtering"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Jiaping Liu", email = "jiaping.liu@stat.ubc.ca"},
+    {name = "Daniel J McDonald", email = "daniel@stat.ubc.ca"},
+    {name = "Addison Hu", email = "mail@huisaddison.com"}
+]
+keywords = ["trend filtering", "signal processing", "optimization", "statistics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "numpy>=1.18.0",
+    "scipy>=1.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "mypy",
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
+[project.urls]
+Homepage = "https://github.com/jiapivialiu/trendfilter-py"
+Repository = "https://github.com/jiapivialiu/trendfilter-py"
+Documentation = "https://trendfilter-py.readthedocs.io"
+"Bug Tracker" = "https://github.com/jiapivialiu/trendfilter-py/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trendfilterpy*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py37']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov=trendfilterpy --cov-report=html --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

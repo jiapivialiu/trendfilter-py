@@ -1,3 +1,46 @@
+Metadata-Version: 2.4
+Name: trendfilter-py
+Version: 0.1.0
+Summary: Python package for fast and flexible univariate trend filtering
+Home-page: https://github.com/jiapivialiu/trendfilter-py
+Author: Your Name
+Author-email: Jiaping Liu <jiaping.liu@stat.ubc.ca>, Daniel J McDonald <daniel@stat.ubc.ca>
+License: MIT
+Project-URL: Homepage, https://github.com/jiapivialiu/trendfilter-py
+Project-URL: Repository, https://github.com/jiapivialiu/trendfilter-py
+Project-URL: Documentation, https://trendfilter-py.readthedocs.io
+Project-URL: Bug Tracker, https://github.com/jiapivialiu/trendfilter-py/issues
+Keywords: trend filtering,signal processing,optimization,statistics
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: C++
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.18.0
+Requires-Dist: scipy>=1.5.0
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: sphinx; extra == "dev"
+Requires-Dist: sphinx-rtd-theme; extra == "dev"
+Dynamic: author
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
 # trendfilter-py
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -102,7 +145,7 @@ If you use this package in your research, please cite:
 ```bibtex
 @software{trendfilter_py,
   title={trendfilter-py: Fast univariate trend filtering in Python},
-  author={Jiaping Liu, Daniel J McDonald, Addison Hu},
+  author={Your Name},
   year={2025},
   url={https://github.com/jiapivialiu/trendfilter-py}
 }
