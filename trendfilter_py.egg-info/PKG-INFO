@@ -4,7 +4,7 @@ Version: 0.1.0
 Summary: Python package for fast and flexible univariate trend filtering
 Home-page: https://github.com/jiapivialiu/trendfilter-py
 Author: Your Name
-Author-email: Jiaping Liu <jiaping.liu@stat.ubc.ca>, Daniel J McDonald <daniel@stat.ubc.ca>
+Author-email: Jiaping Liu <jiaping.liu@stat.ubc.ca>, Daniel J McDonald <daniel@stat.ubc.ca>, Addison Hu <mail@huisaddison.com>
 License: MIT
 Project-URL: Homepage, https://github.com/jiapivialiu/trendfilter-py
 Project-URL: Repository, https://github.com/jiapivialiu/trendfilter-py
@@ -145,7 +145,7 @@ If you use this package in your research, please cite:
 ```bibtex
 @software{trendfilter_py,
   title={trendfilter-py: Fast univariate trend filtering in Python},
-  author={Your Name},
+  author={Jiaping Liu, Daniel J McDonald, Addison Hu},
   year={2025},
   url={https://github.com/jiapivialiu/trendfilter-py}
 }
