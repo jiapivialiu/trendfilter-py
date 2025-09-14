@@ -123,10 +123,20 @@ class CVTrendFilter:
         else:
             x = np.asarray(x, dtype=np.float64)
 
+        # Input validation
+        if len(x) != n:
+            raise ValueError("x and y must have the same length")
+
         if sample_weight is None:
             weights = np.ones(n, dtype=np.float64)
         else:
             weights = np.asarray(sample_weight, dtype=np.float64)
+            if len(weights) != n:
+                raise ValueError("sample_weight must have the same length as y")
+
+        # Validate CV parameter
+        if isinstance(self.cv, int) and self.cv < 2:
+            raise ValueError("cv must be at least 2")
 
         # Generate lambda path if not provided
         if self.lambdas is None:
