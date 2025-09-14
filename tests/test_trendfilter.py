@@ -4,10 +4,10 @@ Tests for the main TrendFilter class.
 
 import numpy as np
 import pytest
-from trendfilterpy import TrendFilter
+from trendfilter import TrendFilter
 
 try:
-    from trendfilterpy import _trendfilter
+    from trendfilter import _trendfilter
     HAS_CPP_BACKEND = True
 except ImportError:
     HAS_CPP_BACKEND = False

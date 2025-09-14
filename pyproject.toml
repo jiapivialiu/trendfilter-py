@@ -57,7 +57,7 @@ Documentation = "https://trendfilter.readthedocs.io"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["trendfilterpy*"]
+include = ["trendfilter*"]
 
 [tool.black]
 line-length = 88
@@ -68,7 +68,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "--cov=trendfilterpy --cov-report=html --cov-report=term-missing"
+addopts = "--cov=trendfilter --cov-report=html --cov-report=term-missing"
 
 [tool.mypy]
 python_version = "3.8"

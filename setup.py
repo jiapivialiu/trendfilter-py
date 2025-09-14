@@ -52,7 +52,7 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 # Get the include directories
 include_dirs = [
     pybind11.get_include(),
-    "trendfilterpy/src",
+    "trendfilter/src",
     np.get_include()
 ]
 
@@ -71,15 +71,15 @@ except Exception as e:
 # Define the extension module
 ext_modules = [
     Pybind11Extension(
-        "trendfilterpy._trendfilter",
+        "trendfilter._trendfilter",
         [
-            "trendfilterpy/src/pybind_wrapper.cpp",
-            "trendfilterpy/src/trendfilter.cpp",
-            "trendfilterpy/src/kf_utils.cpp",
-            "trendfilterpy/src/linearsystem.cpp",
-            "trendfilterpy/src/utils.cpp",
-            "trendfilterpy/src/matrix_construction.cpp",
-            "trendfilterpy/src/matrix_multiplication.cpp",
+            "trendfilter/src/pybind_wrapper.cpp",
+            "trendfilter/src/trendfilter.cpp",
+            "trendfilter/src/kf_utils.cpp",
+            "trendfilter/src/linearsystem.cpp",
+            "trendfilter/src/utils.cpp",
+            "trendfilter/src/matrix_construction.cpp",
+            "trendfilter/src/matrix_multiplication.cpp",
         ],
         include_dirs=include_dirs,
         language='c++',

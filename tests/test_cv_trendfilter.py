@@ -4,7 +4,7 @@ Tests for cross-validation functionality.
 
 import numpy as np
 import pytest
-from trendfilterpy import TrendFilterCV
+from trendfilter import CVTrendFilter
 
 try:
     from sklearn.model_selection import KFold
@@ -13,12 +13,12 @@ except ImportError:
     HAS_SKLEARN = False
 
 
-class TestTrendFilterCV:
-    """Test cases for TrendFilterCV class."""
+class TestCVTrendFilter:
+    """Test cases for CVTrendFilter class."""
     
     def test_init(self):
-        """Test TrendFilterCV initialization."""
-        tf_cv = TrendFilterCV(order=1, cv=5)
+        """Test CVTrendFilter initialization."""
+        tf_cv = CVTrendFilter(order=1, cv=5)
         assert tf_cv.order == 1
         assert tf_cv.cv == 5
         assert tf_cv.scoring == 'neg_mean_squared_error'
@@ -26,7 +26,7 @@ class TestTrendFilterCV:
     def test_init_custom_lambdas(self):
         """Test initialization with custom lambda sequence."""
         lambdas = np.logspace(-3, 1, 20)
-        tf_cv = TrendFilterCV(
+        tf_cv = CVTrendFilter(
             order=2,
             lambdas=lambdas,
             cv=3,
@@ -45,7 +45,7 @@ class TestTrendFilterCV:
         np.random.seed(42)
         y = np.sin(2 * np.pi * x) + 0.1 * np.random.randn(n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
         tf_cv.fit(y, x)
         
         assert hasattr(tf_cv, 'best_lambda_')
@@ -59,7 +59,7 @@ class TestTrendFilterCV:
         np.random.seed(42)
         y = np.random.randn(n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
         tf_cv.fit(y)
         
         assert hasattr(tf_cv, 'best_lambda_')
@@ -73,7 +73,7 @@ class TestTrendFilterCV:
         y = np.random.randn(n)
         weights = np.random.uniform(0.5, 2.0, n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
         tf_cv.fit(y, x, sample_weight=weights)
         
         assert hasattr(tf_cv, 'best_lambda_')
@@ -85,7 +85,7 @@ class TestTrendFilterCV:
         np.random.seed(42)
         y = np.random.randn(n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
         tf_cv.fit(y)
         
         y_pred = tf_cv.predict()
@@ -93,7 +93,7 @@ class TestTrendFilterCV:
         
     def test_predict_before_fit(self):
         """Test that predict raises error before fitting."""
-        tf_cv = TrendFilterCV()
+        tf_cv = CVTrendFilter()
         
         with pytest.raises(ValueError, match="Model must be fitted"):
             tf_cv.predict()
@@ -104,7 +104,7 @@ class TestTrendFilterCV:
         np.random.seed(42)
         y = np.random.randn(n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=np.logspace(-2, 0, 5))
         tf_cv.fit(y)
         
         score = tf_cv.score(y)
@@ -116,7 +116,7 @@ class TestTrendFilterCV:
         np.random.seed(42)
         y = np.random.randn(n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, nlambda=10)
+        tf_cv = CVTrendFilter(order=1, cv=3, nlambda=10)
         tf_cv.fit(y)
         
         assert hasattr(tf_cv, 'lambdas')
@@ -131,12 +131,12 @@ class TestTrendFilterCV:
         lambdas = np.logspace(-2, 0, 5)
         
         # Test integer CV
-        tf_cv1 = TrendFilterCV(order=1, cv=4, lambdas=lambdas)
+        tf_cv1 = CVTrendFilter(order=1, cv=4, lambdas=lambdas)
         tf_cv1.fit(y)
         assert hasattr(tf_cv1, 'best_lambda_')
         
         # Test leave-one-out CV
-        tf_cv2 = TrendFilterCV(order=1, cv=n, lambdas=lambdas)
+        tf_cv2 = CVTrendFilter(order=1, cv=n, lambdas=lambdas)
         tf_cv2.fit(y)
         assert hasattr(tf_cv2, 'best_lambda_')
         
@@ -149,7 +149,7 @@ class TestTrendFilterCV:
         lambdas = np.logspace(-2, 0, 5)
         
         cv = KFold(n_splits=3, shuffle=True, random_state=42)
-        tf_cv = TrendFilterCV(order=1, cv=cv, lambdas=lambdas)
+        tf_cv = CVTrendFilter(order=1, cv=cv, lambdas=lambdas)
         tf_cv.fit(y)
         
         assert hasattr(tf_cv, 'best_lambda_')
@@ -165,7 +165,7 @@ class TestTrendFilterCV:
         scoring_options = ['neg_mean_squared_error', 'neg_mean_absolute_error']
         
         for scoring in scoring_options:
-            tf_cv = TrendFilterCV(
+            tf_cv = CVTrendFilter(
                 order=1, 
                 cv=3, 
                 lambdas=lambdas,
@@ -182,14 +182,14 @@ class TestTrendFilterCV:
         lambdas = np.logspace(-2, 0, 5)
         
         for order in [0, 1, 2]:
-            tf_cv = TrendFilterCV(order=order, cv=3, lambdas=lambdas)
+            tf_cv = CVTrendFilter(order=order, cv=3, lambdas=lambdas)
             tf_cv.fit(y)
             assert hasattr(tf_cv, 'best_lambda_')
             assert tf_cv.coef_.shape[0] == n
             
     def test_input_validation(self):
         """Test input validation."""
-        tf_cv = TrendFilterCV()
+        tf_cv = CVTrendFilter()
         
         # Test mismatched x and y lengths
         x = np.array([1, 2, 3])
@@ -207,7 +207,7 @@ class TestTrendFilterCV:
             
         # Test invalid CV value
         with pytest.raises(ValueError, match="cv must be at least 2"):
-            tf_cv = TrendFilterCV(cv=1)
+            tf_cv = CVTrendFilter(cv=1)
             tf_cv.fit(y)
             
     def test_cv_scores_shape(self):
@@ -218,7 +218,7 @@ class TestTrendFilterCV:
         lambdas = np.logspace(-2, 0, 5)
         cv_folds = 3
         
-        tf_cv = TrendFilterCV(order=1, cv=cv_folds, lambdas=lambdas)
+        tf_cv = CVTrendFilter(order=1, cv=cv_folds, lambdas=lambdas)
         tf_cv.fit(y)
         
         # CV scores should be (n_lambdas, n_folds)
@@ -232,7 +232,7 @@ class TestTrendFilterCV:
         y = np.random.randn(n)
         lambdas = np.logspace(-2, 0, 5)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=lambdas)
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=lambdas)
         tf_cv.fit(y)
         
         # Best lambda should be one of the provided lambdas
@@ -250,7 +250,7 @@ class TestTrendFilterCV:
         y = np.random.randn(n)
         lambdas = np.logspace(-2, 0, 3)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=lambdas)
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=lambdas)
         tf_cv.fit(y)
         
         # Should still work even without sklearn
@@ -263,7 +263,7 @@ class TestTrendFilterCV:
         y_small = np.array([1.0, 2.0, 3.0, 4.0])
         lambdas = [0.1, 1.0]
         
-        tf_cv = TrendFilterCV(order=0, cv=2, lambdas=lambdas)
+        tf_cv = CVTrendFilter(order=0, cv=2, lambdas=lambdas)
         tf_cv.fit(y_small)
         assert hasattr(tf_cv, 'best_lambda_')
         
@@ -272,7 +272,7 @@ class TestTrendFilterCV:
         np.random.seed(42)
         y = np.random.randn(n)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=[0.1])
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=[0.1])
         tf_cv.fit(y)
         assert tf_cv.best_lambda_ == 0.1
         
@@ -283,10 +283,10 @@ class TestTrendFilterCV:
         y = np.random.randn(n)
         lambdas = np.logspace(-2, 0, 5)
         
-        tf_cv1 = TrendFilterCV(order=1, cv=3, lambdas=lambdas, random_state=42)
+        tf_cv1 = CVTrendFilter(order=1, cv=3, lambdas=lambdas, random_state=42)
         tf_cv1.fit(y)
         
-        tf_cv2 = TrendFilterCV(order=1, cv=3, lambdas=lambdas, random_state=42)
+        tf_cv2 = CVTrendFilter(order=1, cv=3, lambdas=lambdas, random_state=42)
         tf_cv2.fit(y)
         
         assert tf_cv1.best_lambda_ == tf_cv2.best_lambda_
@@ -299,7 +299,7 @@ class TestTrendFilterCV:
         y = np.random.randn(n)
         lambdas = np.logspace(-2, 0, 5)
         
-        tf_cv = TrendFilterCV(order=1, cv=3, lambdas=lambdas)
+        tf_cv = CVTrendFilter(order=1, cv=3, lambdas=lambdas)
         tf_cv.fit(y)
         
         # Should be able to get the best estimator

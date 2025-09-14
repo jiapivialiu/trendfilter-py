@@ -40,7 +40,7 @@ pip install -e ".[dev]"
 
 ```python
 import numpy as np
-from trendfilterpy import TrendFilter
+from trendfilter import TrendFilter
 
 # Generate sample data
 n = 100
@@ -52,7 +52,7 @@ tf = TrendFilter(order=1, lambda_reg=0.1)
 y_fit = tf.fit(y)
 
 # Cross-validation for parameter selection
-from trendfilterpy import CVTrendFilter
+from trendfilter import CVTrendFilter
 cv_tf = CVTrendFilter(order=1)
 y_fit_cv = cv_tf.fit(y)
 ```
@@ -88,8 +88,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 1. Clone the repository
 2. Install in development mode: `pip install -e ".[dev]"`
 3. Run tests: `pytest`
-4. Format code: `black trendfilterpy/`
-5. Check types: `mypy trendfilterpy/`
+4. Format code: `black trendfilter/`
+5. Check types: `mypy trendfilter/`
 
 ## License
 
