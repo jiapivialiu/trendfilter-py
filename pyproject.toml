@@ -8,7 +8,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "trendfilter-py"
+name = "trendfilter"
 version = "0.1.0"
 description = "Python package for fast and flexible univariate trend filtering"
 readme = "README.md"
@@ -18,7 +18,7 @@ authors = [
     {name = "Daniel J McDonald", email = "daniel@stat.ubc.ca"},
     {name = "Addison Hu", email = "mail@huisaddison.com"}
 ]
-keywords = ["trend filtering", "signal processing", "optimization", "statistics"]
+keywords = ["trend filtering", "signal processing", "signal denoising", "optimization", "statistics"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
@@ -52,7 +52,7 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/jiapivialiu/trendfilter-py"
 Repository = "https://github.com/jiapivialiu/trendfilter-py"
-Documentation = "https://trendfilter-py.readthedocs.io"
+Documentation = "https://trendfilter.readthedocs.io"
 "Bug Tracker" = "https://github.com/jiapivialiu/trendfilter-py/issues"
 
 [tool.setuptools.packages.find]

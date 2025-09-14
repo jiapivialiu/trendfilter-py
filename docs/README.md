@@ -1,6 +1,6 @@
-# Documentation for trendfilter-py
+# Documentation for trendfilter
 
-This directory contains the documentation for the trendfilter-py package.
+This directory contains the documentation for the trendfilter package.
 
 ## Building Documentation
 

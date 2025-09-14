@@ -1,7 +1,7 @@
-# trendfilter-py
+# trendfilter
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 Python package for fast and flexible univariate trend filtering with C++ backend for high performance.
 
@@ -19,7 +19,7 @@ Trend filtering is a method for nonparametric regression that fits a piecewise p
 
 ### From PyPI (recommended)
 ```bash
-pip install trendfilter-py
+pip install trendfilter
 ```
 
 ### From source
@@ -71,7 +71,7 @@ y_fit_cv = cv_tf.fit(y)
 
 ## Documentation
 
-Full documentation is available at: [https://trendfilter-py.readthedocs.io](https://trendfilter-py.readthedocs.io)
+Full documentation is available at: [https://trendfilter.readthedocs.io](https://trendfilter.readthedocs.io)
 
 ## Requirements
 
@@ -100,8 +100,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this package in your research, please cite:
 
 ```bibtex
-@software{trendfilter_py,
-  title={trendfilter-py: Fast univariate trend filtering in Python},
+@software{trendfilter,
+  title={trendfilter: Fast univariate trend filtering in Python},
   author={Jiaping Liu, Daniel J McDonald, Addison Hu},
   year={2025},
   url={https://github.com/jiapivialiu/trendfilter-py}

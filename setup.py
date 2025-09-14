@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Setup script for trendfilter-py package."""
+"""Setup script for trendfilter package."""
 
 import os
 import platform

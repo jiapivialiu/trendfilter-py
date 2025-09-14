@@ -1,1 +1,1 @@
-# Test directory for trendfilter-py
+# Test directory for trendfilter

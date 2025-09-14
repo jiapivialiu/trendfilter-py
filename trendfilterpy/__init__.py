@@ -1,5 +1,5 @@
 """
-trendfilter-py: Fast and flexible univariate trend filtering
+trendfilter: Fast and flexible univariate trend filtering
 
 A Python package for trend filtering with high-performance C++ backend.
 """

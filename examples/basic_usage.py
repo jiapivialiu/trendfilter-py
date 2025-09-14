@@ -1,5 +1,5 @@
 """
-Example usage of trendfilter-py package.
+Example usage of trendfilter package.
 """
 
 import numpy as np
@@ -133,7 +133,7 @@ def example_cross_validation():
 
 def main():
     """Run all examples."""
-    print("Trendfilter-py Examples")
+    print("Trendfilter Examples")
     print("=======================")
     
     # Check backend availability
