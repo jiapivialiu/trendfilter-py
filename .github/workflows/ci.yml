@@ -50,7 +50,11 @@ jobs:
         
     - name: Type check with mypy
       run: |
-        mypy trendfilter/
+        if [[ "${{ matrix.python-version }}" != "3.8" ]]; then
+          mypy trendfilter/
+        else
+          echo "Skipping mypy for Python 3.8 (not supported by newer mypy versions)"
+        fi
         
     - name: Test with pytest
       run: |
