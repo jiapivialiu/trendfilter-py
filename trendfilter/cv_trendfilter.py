@@ -5,19 +5,19 @@ This module provides cross-validation functionality for automatic parameter sele
 """
 
 import numpy as np
-from typing import Optional, Union, Sequence
+from typing import Optional, Union, Sequence, Any, Generator, Tuple
 import warnings
 from .trendfilter import TrendFilter
 
 try:
-    from . import _trendfilter
+    from . import _trendfilter  # type: ignore
 
     HAS_CPP_BACKEND = True
 except ImportError:
     HAS_CPP_BACKEND = False
 
 try:
-    from sklearn.model_selection import KFold
+    from sklearn.model_selection import KFold  # type: ignore
 
     HAS_SKLEARN = True
 except ImportError:
@@ -36,15 +36,17 @@ class CVTrendFilter:
     ----------
     order : int, default=1
         Order of the trend filtering
-    lambda_path : array-like, optional
+    lambdas : array-like, optional
         Sequence of regularization parameters to try. If None, will be
         automatically generated.
     cv : int or cross-validation generator, default=5
         Cross-validation splitting strategy
-    scoring : str, default='mse'
-        Scoring metric ('mse', 'mae')
-    n_jobs : int, default=None
-        Number of parallel jobs (not yet implemented)
+    scoring : str, default='neg_mean_squared_error'
+        Scoring metric ('neg_mean_squared_error', 'neg_mean_absolute_error')
+    nlambda : int, default=50
+        Number of lambda values to generate if lambdas is None
+    random_state : int, default=None
+        Random state for reproducibility
     max_iter : int, default=200
         Maximum number of ADMM iterations
     tol : float, default=1e-5
@@ -60,8 +62,10 @@ class CVTrendFilter:
         Best cross-validation score
     cv_scores_ : ndarray
         Cross-validation scores for each lambda value
-    lambda_path_ : ndarray
+    lambdas : ndarray
         Regularization parameters tested
+    coef_ : ndarray
+        Coefficients from the best model
     best_estimator_ : TrendFilter
         Trend filter fitted with the best lambda value
     """
@@ -69,19 +73,21 @@ class CVTrendFilter:
     def __init__(
         self,
         order: int = 1,
-        lambda_path: Optional[Sequence[float]] = None,
-        cv: Union[int, object] = 5,
-        scoring: str = "mse",
-        n_jobs: Optional[int] = None,
+        lambdas: Optional[Union[Sequence[float], np.ndarray]] = None,
+        cv: Union[int, Any] = 5,
+        scoring: str = "neg_mean_squared_error",
+        nlambda: int = 50,
+        random_state: Optional[int] = None,
         max_iter: int = 200,
         tol: float = 1e-5,
         method: str = "auto",
     ):
         self.order = order
-        self.lambda_path = lambda_path
+        self.lambdas = lambdas
         self.cv = cv
         self.scoring = scoring
-        self.n_jobs = n_jobs
+        self.nlambda = nlambda
+        self.random_state = random_state
         self.max_iter = max_iter
         self.tol = tol
         self.method = method
@@ -123,24 +129,24 @@ class CVTrendFilter:
             weights = np.asarray(sample_weight, dtype=np.float64)
 
         # Generate lambda path if not provided
-        if self.lambda_path is None:
-            self.lambda_path_ = self._generate_lambda_path(y, x, weights)
+        if self.lambdas is None:
+            lambda_path = self._generate_lambda_path(y, x, weights)
         else:
-            self.lambda_path_ = np.asarray(self.lambda_path, dtype=np.float64)
+            lambda_path = np.asarray(self.lambdas, dtype=np.float64)
 
         # Perform cross-validation
         if HAS_CPP_BACKEND:
-            self._fit_cpp_backend(y, x, weights)
+            self._fit_cpp_backend(y, x, weights, lambda_path)
         else:
-            self._fit_python_backend(y, x, weights)
+            self._fit_python_backend(y, x, weights, lambda_path)
 
         # Find best lambda
-        if self.scoring == "mse":
-            best_idx = np.argmin(self.cv_scores_)
+        if self.scoring in ["neg_mean_squared_error", "mse"]:
+            best_idx = np.argmax(self.cv_scores_)  # Higher is better for negative scores
         else:  # For other metrics that might be maximized
             best_idx = np.argmax(self.cv_scores_)
 
-        self.best_lambda_ = self.lambda_path_[best_idx]
+        self.best_lambda_ = lambda_path[best_idx]
         self.best_score_ = self.cv_scores_[best_idx]
 
         # Fit final model with best lambda
@@ -152,16 +158,20 @@ class CVTrendFilter:
             method=self.method,
         )
         self.best_estimator_.fit(y, x, sample_weight)
+        
+        # Store coefficients and lambda path for compatibility
+        self.coef_ = self.best_estimator_.coef_
+        self.lambdas = lambda_path
 
         return self
 
-    def _fit_cpp_backend(self, y: np.ndarray, x: np.ndarray, weights: np.ndarray):
+    def _fit_cpp_backend(self, y: np.ndarray, x: np.ndarray, weights: np.ndarray, lambda_path: np.ndarray) -> None:
         """Use C++ backend for efficient cross-validation."""
         # For now, use the simple approach with multiple fits
         # TODO: Implement efficient CV in C++ backend
-        self._fit_python_backend(y, x, weights)
+        self._fit_python_backend(y, x, weights, lambda_path)
 
-    def _fit_python_backend(self, y: np.ndarray, x: np.ndarray, weights: np.ndarray):
+    def _fit_python_backend(self, y: np.ndarray, x: np.ndarray, weights: np.ndarray, lambda_path: np.ndarray) -> None:
         """Python implementation of cross-validation."""
         # Set up cross-validation
         if isinstance(self.cv, int):
@@ -175,7 +185,7 @@ class CVTrendFilter:
         # Perform cross-validation
         cv_scores = []
 
-        for lambda_val in self.lambda_path_:
+        for lambda_val in lambda_path:
             scores = []
 
             for train_idx, test_idx in cv_splitter:
@@ -202,7 +212,7 @@ class CVTrendFilter:
 
         self.cv_scores_ = np.array(cv_scores)
 
-    def _simple_kfold(self, n: int, n_splits: int):
+    def _simple_kfold(self, n: int, n_splits: int) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
         """Simple k-fold implementation when sklearn is not available."""
         indices = np.arange(n)
         np.random.seed(42)
@@ -226,7 +236,7 @@ class CVTrendFilter:
             try:
                 lambda_max = _trendfilter.get_lambda_max(x, y, sqrt_weights, self.order)
                 lambda_min = lambda_max * 1e-4
-                return np.logspace(np.log10(lambda_min), np.log10(lambda_max), num=50)
+                return np.logspace(np.log10(lambda_min), np.log10(lambda_max), num=self.nlambda)
             except:
                 # Fallback if C++ function fails
                 pass
@@ -235,7 +245,7 @@ class CVTrendFilter:
         lambda_max = np.var(y)  # Upper bound based on data variance
         lambda_min = lambda_max * 1e-4  # Lower bound
 
-        return np.logspace(np.log10(lambda_min), np.log10(lambda_max), num=50)
+        return np.logspace(np.log10(lambda_min), np.log10(lambda_max), num=self.nlambda)
 
     def _interpolate_prediction(
         self, x_train: np.ndarray, y_train: np.ndarray, x_test: np.ndarray
@@ -248,14 +258,14 @@ class CVTrendFilter:
         """
         if y_train.ndim > 1:
             y_train = y_train[:, 0]  # Take first column if multiple lambda values
-        return np.interp(x_test, x_train, y_train)
+        return np.interp(x_test, x_train, y_train).astype(np.float64)
 
     def _compute_score(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         """Compute the scoring metric."""
-        if self.scoring == "mse":
-            return np.mean((y_true - y_pred) ** 2)
-        elif self.scoring == "mae":
-            return np.mean(np.abs(y_true - y_pred))
+        if self.scoring in ["neg_mean_squared_error", "mse"]:
+            return -float(np.mean((y_true - y_pred) ** 2))  # Negative MSE
+        elif self.scoring in ["neg_mean_absolute_error", "mae"]:
+            return -float(np.mean(np.abs(y_true - y_pred)))  # Negative MAE
         else:
             raise ValueError(f"Unknown scoring metric: {self.scoring}")
 
@@ -276,4 +286,26 @@ class CVTrendFilter:
         if not hasattr(self, "best_estimator_"):
             raise ValueError("Model must be fitted before prediction")
 
-        return self.best_estimator_.predict(X)
+        return np.asarray(self.best_estimator_.predict(X), dtype=np.float64)
+
+    def score(self, y: np.ndarray, X: Optional[np.ndarray] = None) -> float:
+        """
+        Return the score of the prediction.
+
+        Parameters
+        ----------
+        y : array-like of shape (n_samples,)
+            True values
+        X : array-like, optional
+            Not used, present for API consistency
+
+        Returns
+        -------
+        score : float
+            Score of the prediction
+        """
+        if not hasattr(self, "best_estimator_"):
+            raise ValueError("Model must be fitted before scoring")
+
+        y_pred = self.predict(X)
+        return -float(np.mean((y - y_pred) ** 2))  # Return negative MSE

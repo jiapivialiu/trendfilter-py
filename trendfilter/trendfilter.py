@@ -9,7 +9,7 @@ from typing import Optional, Union, Tuple, Dict, Any
 import warnings
 
 try:
-    from . import _trendfilter
+    from . import _trendfilter  # type: ignore
 
     HAS_CPP_BACKEND = True
 except ImportError:
@@ -95,7 +95,7 @@ class TrendFilter:
         y: np.ndarray,
         x: Optional[np.ndarray] = None,
         sample_weight: Optional[np.ndarray] = None,
-    ) -> np.ndarray:
+    ) -> "TrendFilter":
         """
         Fit the trend filter to data.
 
@@ -206,18 +206,19 @@ class TrendFilter:
         Python fallback implementation.
         """
         # Simple smoothing as placeholder
-        from scipy.ndimage import gaussian_filter1d
+        from scipy.ndimage import gaussian_filter1d  # type: ignore
 
         if np.isscalar(self.lambda_reg):
             sigma = 1.0 / np.sqrt(self.lambda_reg)
-            return gaussian_filter1d(y, sigma=sigma)
+            result = gaussian_filter1d(y, sigma=sigma)
+            return np.asarray(result, dtype=np.float64)
         else:
             # For multiple lambdas, return multiple solutions
             results = []
-            for lam in self.lambda_reg:
+            for lam in self.lambda_reg:  # type: ignore
                 sigma = 1.0 / np.sqrt(lam)
                 results.append(gaussian_filter1d(y, sigma=sigma))
-            return np.column_stack(results)
+            return np.column_stack(results).astype(np.float64)
 
     def predict(self, X: Optional[np.ndarray] = None) -> np.ndarray:
         """
@@ -238,7 +239,7 @@ class TrendFilter:
         if not hasattr(self, "coef_"):
             raise ValueError("Model must be fitted before prediction")
 
-        return self.coef_
+        return np.asarray(self.coef_, dtype=np.float64)
 
     def get_best_lambda(self, criterion: str = "cv") -> float:
         """
@@ -260,7 +261,7 @@ class TrendFilter:
 
         # Placeholder: return middle lambda
         # TODO: Implement proper model selection criteria
-        return self.lambda_[len(self.lambda_) // 2]
+        return float(self.lambda_[len(self.lambda_) // 2])
 
     def get_coefficients_at_lambda(self, lambda_val: float) -> np.ndarray:
         """
@@ -283,6 +284,6 @@ class TrendFilter:
         idx = np.argmin(np.abs(self.lambda_ - lambda_val))
 
         if self.coef_.ndim == 1:
-            return self.coef_
+            return np.asarray(self.coef_, dtype=np.float64)
         else:
-            return self.coef_[:, idx]
+            return np.asarray(self.coef_[:, idx], dtype=np.float64)

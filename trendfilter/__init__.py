@@ -15,7 +15,7 @@ try:
 
     # Try to import C++ backend for testing
     try:
-        from . import _trendfilter
+        from . import _trendfilter  # type: ignore
 
         _cpp_available = True
     except ImportError:
@@ -35,7 +35,7 @@ except ImportError as e:
     __all__ = ["__version__"]
 
 
-def get_backend_info():
+def get_backend_info() -> dict:
     """
     Get information about available backends.
 
@@ -47,21 +47,21 @@ def get_backend_info():
     info = {"cpp_backend": False, "scipy_available": False, "sklearn_available": False}
 
     try:
-        from . import _trendfilter
+        from . import _trendfilter  # type: ignore
 
         info["cpp_backend"] = True
     except ImportError:
         pass
 
     try:
-        import scipy
+        import scipy  # type: ignore
 
         info["scipy_available"] = True
     except ImportError:
         pass
 
     try:
-        import sklearn
+        import sklearn  # type: ignore
 
         info["sklearn_available"] = True
     except ImportError:
