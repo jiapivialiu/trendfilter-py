@@ -141,7 +141,11 @@ class CVTrendFilter:
             self._fit_python_backend(y, x, weights, lambda_path)
 
         # Find best lambda from cv_scores_
-        mean_scores = np.mean(self.cv_scores_, axis=1) if self.cv_scores_.ndim > 1 else self.cv_scores_
+        mean_scores = (
+            np.mean(self.cv_scores_, axis=1)
+            if self.cv_scores_.ndim > 1
+            else self.cv_scores_
+        )
         if self.scoring in ["neg_mean_squared_error", "mse"]:
             best_idx = np.argmax(mean_scores)  # Higher is better for negative scores
         else:  # For other metrics that might be maximized
@@ -159,20 +163,24 @@ class CVTrendFilter:
             method=self.method,
         )
         self.best_estimator_.fit(y, x, sample_weight)
-        
+
         # Store coefficients and lambda path for compatibility
         self.coef_ = self.best_estimator_.coef_
         self.lambdas = lambda_path
 
         return self
 
-    def _fit_cpp_backend(self, y: np.ndarray, x: np.ndarray, weights: np.ndarray, lambda_path: np.ndarray) -> None:
+    def _fit_cpp_backend(
+        self, y: np.ndarray, x: np.ndarray, weights: np.ndarray, lambda_path: np.ndarray
+    ) -> None:
         """Use C++ backend for efficient cross-validation."""
         # For now, use the simple approach with multiple fits
         # TODO: Implement efficient CV in C++ backend
         self._fit_python_backend(y, x, weights, lambda_path)
 
-    def _fit_python_backend(self, y: np.ndarray, x: np.ndarray, weights: np.ndarray, lambda_path: np.ndarray) -> None:
+    def _fit_python_backend(
+        self, y: np.ndarray, x: np.ndarray, weights: np.ndarray, lambda_path: np.ndarray
+    ) -> None:
         """Python implementation of cross-validation."""
         # Set up cross-validation
         if isinstance(self.cv, int):
@@ -225,13 +233,17 @@ class CVTrendFilter:
         # Create 2D array
         self.cv_scores_ = np.array(all_fold_scores)  # Shape: (n_lambdas, n_folds)
 
-    def _simple_kfold(self, n: int, n_splits: int) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
+    def _simple_kfold(
+        self, n: int, n_splits: int
+    ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
         """Simple k-fold implementation when sklearn is not available."""
         indices = np.arange(n)
         np.random.seed(42)
         np.random.shuffle(indices)
 
-        fold_sizes = [n // n_splits + (1 if i < n % n_splits else 0) for i in range(n_splits)]
+        fold_sizes = [
+            n // n_splits + (1 if i < n % n_splits else 0) for i in range(n_splits)
+        ]
         start = 0
         for fold_size in fold_sizes:
             end = start + fold_size
@@ -250,7 +262,9 @@ class CVTrendFilter:
             try:
                 lambda_max = _trendfilter.get_lambda_max(x, y, sqrt_weights, self.order)
                 lambda_min = lambda_max * 1e-4
-                return np.logspace(np.log10(lambda_min), np.log10(lambda_max), num=self.nlambda)
+                return np.logspace(
+                    np.log10(lambda_min), np.log10(lambda_max), num=self.nlambda
+                )
             except:
                 # Fallback if C++ function fails
                 pass
@@ -322,7 +336,7 @@ class CVTrendFilter:
             raise ValueError("Model must be fitted before scoring")
 
         y_pred = self.predict(X)
-        
+
         # Handle case where prediction returns multiple columns
         if y_pred.ndim > 1:
             # Take first column or reshape appropriately
@@ -330,14 +344,16 @@ class CVTrendFilter:
                 y_pred = y_pred.ravel()
             else:
                 # If there are multiple lambda solutions, take the best one
-                y_pred = y_pred[:, 0] if hasattr(self, 'best_estimator_') else y_pred.ravel()
+                y_pred = (
+                    y_pred[:, 0] if hasattr(self, "best_estimator_") else y_pred.ravel()
+                )
         if y.ndim > 1:
             y = y.ravel()
-            
+
         # Ensure shapes match
         if y.shape != y_pred.shape:
             min_len = min(len(y), len(y_pred))
             y = y[:min_len]
             y_pred = y_pred[:min_len]
-            
+
         return -float(np.mean((y - y_pred) ** 2))  # Return negative MSE
