@@ -55,6 +55,7 @@ jobs:
         else
           echo "Skipping mypy for Python 3.8 (not supported by newer mypy versions)"
         fi
+      shell: bash
         
     - name: Test with pytest
       run: |
