@@ -140,14 +140,15 @@ class CVTrendFilter:
         else:
             self._fit_python_backend(y, x, weights, lambda_path)
 
-        # Find best lambda
+        # Find best lambda from cv_scores_
+        mean_scores = np.mean(self.cv_scores_, axis=1) if self.cv_scores_.ndim > 1 else self.cv_scores_
         if self.scoring in ["neg_mean_squared_error", "mse"]:
-            best_idx = np.argmax(self.cv_scores_)  # Higher is better for negative scores
+            best_idx = np.argmax(mean_scores)  # Higher is better for negative scores
         else:  # For other metrics that might be maximized
-            best_idx = np.argmax(self.cv_scores_)
+            best_idx = np.argmax(mean_scores)
 
         self.best_lambda_ = lambda_path[best_idx]
-        self.best_score_ = self.cv_scores_[best_idx]
+        self.best_score_ = mean_scores[best_idx]
 
         # Fit final model with best lambda
         self.best_estimator_ = TrendFilter(
@@ -184,9 +185,12 @@ class CVTrendFilter:
 
         # Perform cross-validation
         cv_scores = []
+        all_fold_scores = []
+        n_folds = 0
 
         for lambda_val in lambda_path:
             scores = []
+            fold_count = 0
 
             for train_idx, test_idx in cv_splitter:
                 # Fit on training set
@@ -207,10 +211,19 @@ class CVTrendFilter:
                 # Compute score
                 score = self._compute_score(y[test_idx], y_test_pred)
                 scores.append(score)
+                fold_count += 1
+
+            if n_folds == 0:
+                n_folds = fold_count
 
             cv_scores.append(np.mean(scores))
+            # Pad scores to ensure consistent length if needed
+            while len(scores) < n_folds:
+                scores.append(np.nan)
+            all_fold_scores.append(scores[:n_folds])
 
-        self.cv_scores_ = np.array(cv_scores)
+        # Create 2D array
+        self.cv_scores_ = np.array(all_fold_scores)  # Shape: (n_lambdas, n_folds)
 
     def _simple_kfold(self, n: int, n_splits: int) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
         """Simple k-fold implementation when sklearn is not available."""
@@ -218,13 +231,14 @@ class CVTrendFilter:
         np.random.seed(42)
         np.random.shuffle(indices)
 
-        fold_size = n // n_splits
-        for i in range(n_splits):
-            start = i * fold_size
-            end = start + fold_size if i < n_splits - 1 else n
+        fold_sizes = [n // n_splits + (1 if i < n % n_splits else 0) for i in range(n_splits)]
+        start = 0
+        for fold_size in fold_sizes:
+            end = start + fold_size
             test_idx = indices[start:end]
             train_idx = np.concatenate([indices[:start], indices[end:]])
             yield train_idx, test_idx
+            start = end
 
     def _generate_lambda_path(
         self, y: np.ndarray, x: np.ndarray, weights: np.ndarray
@@ -308,4 +322,22 @@ class CVTrendFilter:
             raise ValueError("Model must be fitted before scoring")
 
         y_pred = self.predict(X)
+        
+        # Handle case where prediction returns multiple columns
+        if y_pred.ndim > 1:
+            # Take first column or reshape appropriately
+            if y_pred.shape[1] == 1:
+                y_pred = y_pred.ravel()
+            else:
+                # If there are multiple lambda solutions, take the best one
+                y_pred = y_pred[:, 0] if hasattr(self, 'best_estimator_') else y_pred.ravel()
+        if y.ndim > 1:
+            y = y.ravel()
+            
+        # Ensure shapes match
+        if y.shape != y_pred.shape:
+            min_len = min(len(y), len(y_pred))
+            y = y[:min_len]
+            y_pred = y_pred[:min_len]
+            
         return -float(np.mean((y - y_pred) ** 2))  # Return negative MSE
