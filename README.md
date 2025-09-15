@@ -17,9 +17,9 @@ Trend filtering is a method for nonparametric regression that fits a piecewise p
 
 ## Installation
 
-### From PyPI (recommended)
+### From GitHub
 ```bash
-pip install trendfilter
+pip install git+https://github.com/jiapivialiu/trendfilter-py.git
 ```
 
 ### From source
@@ -29,33 +29,34 @@ cd trendfilter-py
 pip install .
 ```
 
-### Development installation
-```bash
-git clone https://github.com/jiapivialiu/trendfilter-py.git
-cd trendfilter-py
-pip install -e ".[dev]"
-```
-
 ## Quick Start
 
 ```python
 import numpy as np
-from trendfilter import TrendFilter
+import pandas as pd
+import matplotlib.pyplot as plt
+from trendfilter import TrendFilter, CVTrendFilter
 
 # Generate sample data
 n = 100
 x = np.linspace(0, 1, n)
-y = np.sin(2 * np.pi * x) + 0.1 * np.random.randn(n)
+true_signal = np.sin(2 * np.pi * x) + 0.5 * np.cos(4 * np.pi * x)
+y = true_signal + 0.2 * np.random.randn(n)
 
 # Fit trend filter
-tf = TrendFilter(order=1, lambda_reg=0.1)
-y_fit = tf.fit(y)
+tf = TrendFilter(order=2, lambda_reg=0.1)
+tf.fit(y)
+y_fit = tf.predict()
 
 # Cross-validation for parameter selection
-from trendfilter import CVTrendFilter
-cv_tf = CVTrendFilter(order=1)
-y_fit_cv = cv_tf.fit(y)
+cv_tf = CVTrendFilter(order=2)
+cv_tf.fit(y)
+y_fit_cv = cv_tf.predict()
 ```
+
+Check out the [README_plot](examples/generate_readme_plot.py) script or the [basic_usage](examples/basic_usage.py) for visualizing the output. Preview of the output as below:
+
+![Quick Start figure](assets/readme_quickstart.png)
 
 ## Features
 
@@ -69,46 +70,8 @@ y_fit_cv = cv_tf.fit(y)
 - **Efficient Solvers**: Specialized linear system solvers
 - **Memory Optimized**: Efficient memory usage for large datasets
 
-## Documentation
-
-Full documentation is available at: [https://trendfilter.readthedocs.io](https://trendfilter.readthedocs.io)
-
 ## Requirements
 
 - Python >= 3.7
 - NumPy >= 1.18.0
 - SciPy >= 1.5.0
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-1. Clone the repository
-2. Install in development mode: `pip install -e ".[dev]"`
-3. Run tests: `pytest`
-4. Format code: `black trendfilter/`
-5. Check types: `mypy trendfilter/`
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Citation
-
-If you use this package in your research, please cite:
-
-```bibtex
-@software{trendfilter,
-  title={trendfilter: Fast univariate trend filtering in Python},
-  author={Jiaping Liu, Daniel J McDonald, Addison Hu},
-  year={2025},
-  url={https://github.com/jiapivialiu/trendfilter-py}
-}
-```
-
-## Acknowledgments
-
-- Built with [pybind11](https://github.com/pybind/pybind11) for Python-C++ integration
-- Inspired by the R package [genlasso](https://github.com/ryantibs/genlasso)
