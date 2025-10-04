@@ -93,7 +93,7 @@ jobs:
             
           # Test the built wheels
           CIBW_TEST_REQUIRES: pytest numpy scipy
-          CIBW_TEST_COMMAND: "python -c 'import trendfilter; print(\"✓ Import successful!\"); import numpy as np; tf = trendfilter.TrendFilter(); print(\"✓ Basic functionality working!\")'"
+          CIBW_TEST_COMMAND: "python -c \"import trendfilter; print('Import successful'); import numpy as np; tf = trendfilter.TrendFilter(); print('Basic functionality working')\""
           
           # Skip testing on emulated architectures (too slow)
           CIBW_TEST_SKIP: "*-*linux_{aarch64,ppc64le,s390x} *-*linux_aarch64"

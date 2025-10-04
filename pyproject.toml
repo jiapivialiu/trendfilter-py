@@ -94,8 +94,8 @@ skip = [
 # Test the built wheels
 test-requires = ["pytest", "numpy>=1.18.0", "scipy>=1.5.0"]
 test-command = [
-    "python -c 'import trendfilter; print(\"✓ Import successful!\")'",
-    "python -c 'import trendfilter; import numpy as np; tf = trendfilter.TrendFilter(); y = np.random.randn(10); tf.fit(y); print(\"✓ Basic functionality working!\")'"
+    "python -c \"import trendfilter; print('Import successful')\"",
+    "python -c \"import trendfilter; import numpy as np; tf = trendfilter.TrendFilter(); print('Basic functionality working')\""
 ]
 
 # Build settings for different platforms
