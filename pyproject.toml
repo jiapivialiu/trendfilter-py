@@ -142,5 +142,5 @@ before-all = [
 # Build for both x86_64 and ARM64 (Apple Silicon)
 archs = ["x86_64", "arm64"]
 
-# Minimum macOS version for compatibility
-environment = { MACOSX_DEPLOYMENT_TARGET = "10.14" }
+# Minimum macOS version for compatibility - use 11.0 for better GitHub Actions compatibility
+environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
