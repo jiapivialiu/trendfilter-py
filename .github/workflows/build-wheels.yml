@@ -163,7 +163,7 @@ jobs:
           echo "Platform information:"
           python -c "import platform; print(f'Platform: {platform.platform()}'); print(f'Machine: {platform.machine()}'); print(f'Architecture: {platform.architecture()}'); print(f'System: {platform.system()}'); print(f'Release: {platform.release()}')"
           echo "Available wheels:"
-          ls -la ./wheels/
+          python -c "import os; import glob; wheels = glob.glob('./wheels/*.whl'); print('\\n'.join(wheels) if wheels else 'No wheels found'); [print(f'  {w} ({os.path.getsize(w)} bytes)') for w in wheels]"
           echo "Pip debug info:"
           python -m pip debug --verbose
 
@@ -237,31 +237,3 @@ jobs:
           print(f'CV functionality working: input {y.shape} -> output {y_cv_pred.shape}')
           print('All tests passed!')
           "
-
-  upload_pypi:
-    name: Upload to PyPI
-    needs: [build_wheels, build_sdist, test_wheels]
-    runs-on: ubuntu-latest
-    # Only upload on tagged releases
-    if: github.event_name == 'release' && github.event.action == 'published'
-    
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
-
-      - name: Flatten directory structure
-        run: |
-          mkdir -p final_dist/
-          # In v4, artifacts are downloaded into subdirectories by name
-          find dist/ -name "*.whl" -exec cp {} final_dist/ \;
-          find dist/ -name "*.tar.gz" -exec cp {} final_dist/ \;
-          echo "Files to upload:"
-          ls -la final_dist/
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: final_dist/
-          password: ${{ secrets.PYPI_API_TOKEN }}
