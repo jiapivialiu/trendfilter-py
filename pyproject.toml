@@ -78,3 +78,53 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 ignore_missing_imports = true
 disable_error_code = "no-any-return"
+
+[tool.cibuildwheel]
+# Build for Python 3.8-3.12
+build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
+
+# Skip 32-bit builds, PyPy, and musl on Linux
+skip = [
+    "*-win32",
+    "*-manylinux_i686", 
+    "*-musllinux_*",
+    "pp*"
+]
+
+# Test the built wheels
+test-requires = ["pytest", "numpy>=1.18.0", "scipy>=1.5.0"]
+test-command = [
+    "python -c 'import trendfilter; print(\"✓ Import successful!\")'",
+    "python -c 'import trendfilter; import numpy as np; tf = trendfilter.TrendFilter(); y = np.random.randn(10); tf.fit(y); print(\"✓ Basic functionality working!\")'"
+]
+
+# Build settings for different platforms
+[tool.cibuildwheel.linux]
+before-all = [
+    # Try different package managers for Eigen3
+    "yum update -y && (yum install -y eigen3-devel || yum install -y epel-release && yum install -y eigen3-devel) || true",
+    "apt-get update && apt-get install -y libeigen3-dev || true", 
+    "apk add --no-cache eigen-dev || true"
+]
+
+# Use manylinux2014 for broader compatibility
+manylinux-x86_64-image = "manylinux2014"
+manylinux-aarch64-image = "manylinux2014"
+
+[tool.cibuildwheel.windows]
+before-all = [
+    "vcpkg install eigen3:x64-windows"
+]
+
+environment = { EIGEN3_INCLUDE_DIR = "C:/vcpkg/installed/x64-windows/include" }
+
+[tool.cibuildwheel.macos]
+before-all = [
+    "brew install eigen"
+]
+
+# Build for both x86_64 and ARM64 (Apple Silicon)
+archs = ["x86_64", "arm64"]
+
+# Minimum macOS version for compatibility
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.14" }

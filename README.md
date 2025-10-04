@@ -17,16 +17,46 @@ Trend filtering is a method for nonparametric regression that fits a piecewise p
 
 ## Installation
 
-### From GitHub
+### Pre-built Wheels (Recommended)
+
+Pre-built wheels are available for major platforms:
+
+- **Linux**: x86_64 (manylinux2014)
+- **Windows**: x86_64 
+- **macOS**: x86_64 and ARM64 (Apple Silicon)
+- **Python**: 3.8, 3.9, 3.10, 3.11, 3.12
+
 ```bash
-pip install git+https://github.com/jiapivialiu/trendfilter-py.git
+pip install trendfilter
 ```
+
+*Note: If no wheel is available for your platform, pip will automatically fall back to building from source.*
 
 ### From source
 ```bash
 git clone https://github.com/jiapivialiu/trendfilter-py.git
 cd trendfilter-py
 pip install .
+```
+
+**Requirements for source installation:**
+- C++ compiler (GCC, Clang, or MSVC)
+- Eigen3 development headers
+- CMake (for some build configurations)
+
+#### Platform-specific dependencies:
+```bash
+# Ubuntu/Debian
+sudo apt-get install libeigen3-dev
+
+# CentOS/RHEL
+sudo yum install eigen3-devel
+
+# macOS
+brew install eigen
+
+# Windows (with vcpkg)
+vcpkg install eigen3:x64-windows
 ```
 
 ## Quick Start

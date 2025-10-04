@@ -11,6 +11,11 @@ import numpy as np
 
 def get_eigen_include():
     """Find Eigen include directory."""
+    # Check environment variable first (for CI/CD)
+    env_path = os.environ.get('EIGEN3_INCLUDE_DIR')
+    if env_path and os.path.exists(os.path.join(env_path, "Eigen")):
+        return env_path
+    
     # Common Eigen installation paths
     potential_paths = [
         "/opt/homebrew/include/eigen3",  # macOS Homebrew
@@ -18,6 +23,7 @@ def get_eigen_include():
         "/usr/include/eigen3",           # System installation
         "/usr/include/eigen",            # Alternative system path
         "C:/vcpkg/installed/x64-windows/include/eigen3",  # Windows vcpkg
+        "C:/vcpkg/installed/x64-windows/include",         # Windows vcpkg alternative
         "C:/Program Files/Eigen3/include/eigen3",         # Windows manual install
     ]
     
@@ -41,8 +47,10 @@ def get_eigen_include():
     print("Warning: Could not find Eigen installation.")
     print("Build may fail. Please install Eigen3:")
     print("  - Ubuntu/Debian: sudo apt-get install libeigen3-dev")
+    print("  - CentOS/RHEL: sudo yum install eigen3-devel")
     print("  - macOS: brew install eigen")
     print("  - Windows: vcpkg install eigen3:x64-windows")
+    print("  - Or set EIGEN3_INCLUDE_DIR environment variable")
     return "/usr/include/eigen3"  # Default fallback
 
 
