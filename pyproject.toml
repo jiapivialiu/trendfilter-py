@@ -122,14 +122,15 @@ manylinux-x86_64-image = "manylinux2014"
 manylinux-aarch64-image = "manylinux2014"
 
 [tool.cibuildwheel.windows]
-before-all = [
-    # Install Eigen3 from source for Windows
-    "curl -L -o eigen.zip https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip",
-    "powershell -Command \"Expand-Archive eigen.zip -DestinationPath C:\\temp\"",
-    "mkdir C:\\eigen3",
-    "xcopy C:\\temp\\eigen-3.4.0\\Eigen C:\\eigen3\\Eigen /E /I",
-    "xcopy C:\\temp\\eigen-3.4.0\\unsupported C:\\eigen3\\unsupported /E /I"
-]
+before-all = """powershell -Command "
+Write-Host 'Installing Eigen3 from source on Windows...';
+Invoke-WebRequest -Uri 'https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip' -OutFile 'eigen.zip';
+Expand-Archive -Path 'eigen.zip' -DestinationPath 'C:\\temp' -Force;
+New-Item -Path 'C:\\eigen3' -ItemType Directory -Force;
+Copy-Item -Path 'C:\\temp\\eigen-3.4.0\\Eigen' -Destination 'C:\\eigen3\\Eigen' -Recurse -Force;
+Copy-Item -Path 'C:\\temp\\eigen-3.4.0\\unsupported' -Destination 'C:\\eigen3\\unsupported' -Recurse -Force;
+Write-Host 'Eigen3 installed to C:\\eigen3'
+\""""
 
 environment = { EIGEN3_INCLUDE_DIR = "C:/eigen3" }
 
