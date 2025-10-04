@@ -218,7 +218,7 @@ jobs:
           import numpy as np
           
           # Test basic functionality
-          print('✓ TrendFilter import successful')
+          print('TrendFilter import successful')
           
           # Test basic functionality (uses Python fallback if C++ not available)
           tf = trendfilter.TrendFilter(order=1, lambda_reg=0.1)
@@ -226,15 +226,15 @@ jobs:
           tf.fit(y)
           y_pred = tf.predict()
           
-          print(f'✓ Basic functionality working: input {y.shape} -> output {y_pred.shape}')
+          print(f'Basic functionality working: input {y.shape} -> output {y_pred.shape}')
           
           # Test CV functionality
           cv_tf = trendfilter.CVTrendFilter(order=1)
           cv_tf.fit(y)
           y_cv_pred = cv_tf.predict()
           
-          print(f'✓ CV functionality working: input {y.shape} -> output {y_cv_pred.shape}')
-          print('🎉 All tests passed!')
+          print(f'CV functionality working: input {y.shape} -> output {y_cv_pred.shape}')
+          print('All tests passed!')
           "
 
   upload_pypi:

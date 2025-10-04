@@ -142,7 +142,7 @@ def main():
         backend_info = get_backend_info()
         print("Backend availability:")
         for backend, available in backend_info.items():
-            print(f"  {backend}: {'✓' if available else '✗'}")
+            print(f"  {backend}: {'OK' if available else 'NO'}")
         print()
     except ImportError:
         print("Backend info not available\n")

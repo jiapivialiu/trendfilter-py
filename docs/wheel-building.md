@@ -63,8 +63,8 @@ build = "cp38-* cp39-* cp310-* cp311-* cp312-*"  # Python versions
 skip = ["*-win32", "*-manylinux_i686", "*-musllinux_*", "pp*"]  # Skip patterns
 test-requires = ["pytest", "numpy>=1.18.0", "scipy>=1.5.0"]
 test-command = [
-    "python -c 'import trendfilter; print(\"✓ Import successful!\")'",
-    "python -c 'import trendfilter; import numpy as np; tf = trendfilter.TrendFilter(); y = np.random.randn(10); tf.fit(y); print(\"✓ Basic functionality working!\")'"
+    "python -c 'import trendfilter; print(\"Import successful!\")'",
+    "python -c 'import trendfilter; import numpy as np; tf = trendfilter.TrendFilter(); y = np.random.randn(10); tf.fit(y); print(\"Basic functionality working!\")'"
 ]
 ```
 

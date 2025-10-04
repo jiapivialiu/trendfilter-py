@@ -21,7 +21,7 @@ This request has been automatically failed because it uses a deprecated version 
 
 ### Important Changes in v4 Artifacts
 
-**⚠️ Breaking Change**: `actions/download-artifact@v4` behavior changed:
+**WARNING - Breaking Change**: `actions/download-artifact@v4` behavior changed:
 
 - **v3**: Downloads artifacts directly to specified path
 - **v4**: Downloads each artifact into its own subdirectory by name
