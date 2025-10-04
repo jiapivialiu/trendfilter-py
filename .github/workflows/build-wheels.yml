@@ -198,9 +198,10 @@ jobs:
                       print('Falling back to source installation...')
                       # Install from source as fallback
                       subprocess.run([sys.executable, '-m', 'pip', 'install', '.'], check=True)
-                      return
+                      # Skip dependency installation for source install (already handled by setup.py)
+                      sys.exit(0)
               
-              # Install dependencies separately
+              # Install dependencies separately (only reached if wheel install succeeded)
               subprocess.run([sys.executable, '-m', 'pip', 'install', 'numpy>=1.18.0', 'scipy>=1.5.0'], check=True)
           else:
               print(f'No wheel found for Python {py_tag}')
