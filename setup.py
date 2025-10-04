@@ -23,6 +23,7 @@ def get_eigen_include():
         "/usr/include/eigen3",           # System installation (manylinux, Ubuntu/Debian)
         "/usr/include/eigen",            # Alternative system path
         "/usr/local/include/eigen",      # Local installation
+        "C:/eigen3",                     # Windows cibuildwheel installation
         "C:/vcpkg/installed/x64-windows/include/eigen3",  # Windows vcpkg
         "C:/vcpkg/installed/x64-windows/include",         # Windows vcpkg alternative
         "C:/Program Files/Eigen3/include/eigen3",         # Windows manual install

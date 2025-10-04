@@ -123,10 +123,15 @@ manylinux-aarch64-image = "manylinux2014"
 
 [tool.cibuildwheel.windows]
 before-all = [
-    "vcpkg install eigen3:x64-windows"
+    # Install Eigen3 from source for Windows
+    "curl -L -o eigen.zip https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip",
+    "powershell -Command \"Expand-Archive eigen.zip -DestinationPath C:\\temp\"",
+    "mkdir C:\\eigen3",
+    "xcopy C:\\temp\\eigen-3.4.0\\Eigen C:\\eigen3\\Eigen /E /I",
+    "xcopy C:\\temp\\eigen-3.4.0\\unsupported C:\\eigen3\\unsupported /E /I"
 ]
 
-environment = { EIGEN3_INCLUDE_DIR = "C:/vcpkg/installed/x64-windows/include" }
+environment = { EIGEN3_INCLUDE_DIR = "C:/eigen3" }
 
 [tool.cibuildwheel.macos]
 before-all = [

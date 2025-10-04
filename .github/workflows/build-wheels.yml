@@ -40,11 +40,8 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          # Install vcpkg and eigen3
-          git clone https://github.com/Microsoft/vcpkg.git
-          .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg install eigen3:x64-windows
-          echo "EIGEN3_INCLUDE_DIR=D:\a\trendfilter-py\trendfilter-py\vcpkg\installed\x64-windows\include" >> $env:GITHUB_ENV
+          # Note: Eigen3 will be installed inside cibuildwheel containers
+          echo "Eigen3 will be installed during wheel building"
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.21.2
@@ -74,15 +71,21 @@ jobs:
             }
           
           CIBW_BEFORE_ALL_WINDOWS: |
-            vcpkg install eigen3:x64-windows
+            # Install Eigen3 from source for Windows
+            echo "Installing Eigen3 from source on Windows..."
+            curl -L -o eigen.zip https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip
+            powershell -Command "Expand-Archive eigen.zip -DestinationPath C:\temp"
+            mkdir "C:\eigen3"
+            xcopy "C:\temp\eigen-3.4.0\Eigen" "C:\eigen3\Eigen" /E /I
+            xcopy "C:\temp\eigen-3.4.0\unsupported" "C:\eigen3\unsupported" /E /I
+            echo "Eigen3 installed to C:\eigen3"
             
           CIBW_BEFORE_ALL_MACOS: |
             brew install eigen
             
           # Set environment variables for builds
           CIBW_ENVIRONMENT_WINDOWS: >
-            EIGEN3_INCLUDE_DIR="C:/vcpkg/installed/x64-windows/include"
-            CMAKE_PREFIX_PATH="C:/vcpkg/installed/x64-windows"
+            EIGEN3_INCLUDE_DIR="C:/eigen3"
             
           # Test the built wheels
           CIBW_TEST_REQUIRES: pytest numpy scipy
