@@ -47,7 +47,7 @@ jobs:
           echo "EIGEN3_INCLUDE_DIR=D:\a\trendfilter-py\trendfilter-py\vcpkg\installed\x64-windows\include" >> $env:GITHUB_ENV
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.21.2
         env:
           # Build for Python 3.8-3.12
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-*"
@@ -81,7 +81,7 @@ jobs:
           CIBW_TEST_SKIP: "*-*linux_{aarch64,ppc64le,s390x} *-*linux_aarch64"
 
       - name: Upload wheels as artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
@@ -93,7 +93,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -106,7 +106,7 @@ jobs:
         run: python -m build --sdist
 
       - name: Upload sdist as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sdist
           path: dist/*.tar.gz
@@ -124,12 +124,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download wheels
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: wheels-${{ matrix.os }}
           path: ./wheels/
@@ -193,13 +193,14 @@ jobs:
     
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: dist/
 
       - name: Flatten directory structure
         run: |
           mkdir -p final_dist/
+          # In v4, artifacts are downloaded into subdirectories by name
           find dist/ -name "*.whl" -exec cp {} final_dist/ \;
           find dist/ -name "*.tar.gz" -exec cp {} final_dist/ \;
           echo "Files to upload:"
