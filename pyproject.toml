@@ -101,10 +101,20 @@ test-command = [
 # Build settings for different platforms
 [tool.cibuildwheel.linux]
 before-all = [
-    # Try different package managers for Eigen3
-    "yum update -y && (yum install -y eigen3-devel || yum install -y epel-release && yum install -y eigen3-devel) || true",
-    "apt-get update && apt-get install -y libeigen3-dev || true", 
-    "apk add --no-cache eigen-dev || true"
+    # Install Eigen3 for manylinux (CentOS/RHEL based)
+    "yum update -y",
+    "yum install -y epel-release",
+    """yum install -y eigen3-devel || {
+        echo "Installing Eigen3 from source..."
+        yum install -y wget tar
+        cd /tmp
+        wget -q https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+        tar xzf eigen-3.4.0.tar.gz
+        mkdir -p /usr/include/eigen3
+        cp -r eigen-3.4.0/Eigen /usr/include/eigen3/
+        cp -r eigen-3.4.0/unsupported /usr/include/eigen3/
+        echo "Eigen3 installed to /usr/include/eigen3"
+    }"""
 ]
 
 # Use manylinux2014 for broader compatibility

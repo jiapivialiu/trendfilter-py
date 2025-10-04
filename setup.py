@@ -20,8 +20,9 @@ def get_eigen_include():
     potential_paths = [
         "/opt/homebrew/include/eigen3",  # macOS Homebrew
         "/usr/local/include/eigen3",     # Linux/Unix
-        "/usr/include/eigen3",           # System installation
+        "/usr/include/eigen3",           # System installation (manylinux, Ubuntu/Debian)
         "/usr/include/eigen",            # Alternative system path
+        "/usr/local/include/eigen",      # Local installation
         "C:/vcpkg/installed/x64-windows/include/eigen3",  # Windows vcpkg
         "C:/vcpkg/installed/x64-windows/include",         # Windows vcpkg alternative
         "C:/Program Files/Eigen3/include/eigen3",         # Windows manual install
